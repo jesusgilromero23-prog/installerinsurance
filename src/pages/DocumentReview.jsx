@@ -31,11 +31,15 @@ export default function DocumentReview() {
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['documents-review'],
     queryFn: () => base44.asServiceRole.entities.Document.list('-created_date'),
+    staleTime: 2 * 60 * 1000,
+    retry: 2
   });
   
   const { data: contractors = [] } = useQuery({
     queryKey: ['contractors'],
     queryFn: () => base44.entities.Contractor.list(),
+    staleTime: 5 * 60 * 1000,
+    retry: 2
   });
   
   const getContractor = (id) => contractors.find(c => c.id === id);
@@ -56,42 +60,53 @@ export default function DocumentReview() {
       return;
     }
     
-    setIsSubmitting(true);
-    
-    await base44.asServiceRole.entities.Document.update(reviewDialog.id, {
-      ...reviewDialog.data,
-      status: action === 'approve' ? 'approved' : 'rejected',
-      approval_comments: comments,
-      reviewed_by: user?.email,
-      reviewed_date: new Date().toISOString()
-    });
-    
-    // Enviar notificación al contratista
-    const contractor = getContractor(reviewDialog.data.contractor_id);
-    if (contractor) {
-      const emailSubject = action === 'approve' 
-        ? `✅ Documento Aprobado: ${reviewDialog.data.document_name}`
-        : `❌ Documento Rechazado: ${reviewDialog.data.document_name}`;
-      
-      const emailBody = action === 'approve'
-        ? `Hola ${contractor.data.contact_name || contractor.data.company_name},\n\nTu documento "${reviewDialog.data.document_name}" ha sido APROBADO.\n\nComentarios: ${comments}\n\nSaludos,\nSistema de Gestión de Contratistas`
-        : `Hola ${contractor.data.contact_name || contractor.data.company_name},\n\nTu documento "${reviewDialog.data.document_name}" ha sido RECHAZADO.\n\nRazón: ${comments}\n\nPor favor, sube una nueva versión correcta.\n\nSaludos,\nSistema de Gestión de Contratistas`;
-      
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: contractor.data.email,
-        subject: emailSubject,
-        body: emailBody,
-        from_name: 'ContractorHub'
-      });
+    if (!user?.email) {
+      toast.error('Error: Usuario no identificado');
+      return;
     }
     
-    toast.success(action === 'approve' ? 'Documento aprobado' : 'Documento rechazado');
-    queryClient.invalidateQueries({ queryKey: ['documents-review'] });
-    queryClient.invalidateQueries({ queryKey: ['documents'] });
+    setIsSubmitting(true);
     
-    setIsSubmitting(false);
-    setReviewDialog(null);
-    setComments('');
+    try {
+      await base44.asServiceRole.entities.Document.update(reviewDialog.id, {
+        ...reviewDialog.data,
+        status: action === 'approve' ? 'approved' : 'rejected',
+        approval_comments: comments,
+        reviewed_by: user.email,
+        reviewed_date: new Date().toISOString()
+      });
+      
+      // Enviar notificación al contratista
+      const contractor = getContractor(reviewDialog.data.contractor_id);
+      if (contractor) {
+        const emailSubject = action === 'approve' 
+          ? `✅ Documento Aprobado: ${reviewDialog.data.document_name}`
+          : `❌ Documento Rechazado: ${reviewDialog.data.document_name}`;
+        
+        const emailBody = action === 'approve'
+          ? `Hola ${contractor.data.contact_name || contractor.data.company_name},\n\nTu documento "${reviewDialog.data.document_name}" ha sido APROBADO.\n\nComentarios: ${comments}\n\nSaludos,\nSistema de Gestión de Contratistas`
+          : `Hola ${contractor.data.contact_name || contractor.data.company_name},\n\nTu documento "${reviewDialog.data.document_name}" ha sido RECHAZADO.\n\nRazón: ${comments}\n\nPor favor, sube una nueva versión correcta.\n\nSaludos,\nSistema de Gestión de Contratistas`;
+        
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: contractor.data.email,
+          subject: emailSubject,
+          body: emailBody,
+          from_name: 'ContractorHub'
+        });
+      }
+      
+      toast.success(action === 'approve' ? 'Documento aprobado' : 'Documento rechazado');
+      queryClient.invalidateQueries({ queryKey: ['documents-review'] });
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      
+      setReviewDialog(null);
+      setComments('');
+    } catch (error) {
+      toast.error('Error al procesar la revisión del documento');
+      console.error('Error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const DocumentPreview = ({ doc }) => {
