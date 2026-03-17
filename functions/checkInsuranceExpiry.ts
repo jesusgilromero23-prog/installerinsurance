@@ -41,23 +41,22 @@ Deno.serve(async (req) => {
       
       // Seguro vencido
       if (expirationDate < now && !insurance.data.reminder_sent) {
-        const emailBody = `
-Hola ${contractor.data.contact_name || contractor.data.company_name},
+        const emailBody = `Hola ${contractor.data.contact_name || contractor.data.company_name},
 
-El seguro de ${contractor.data.company_name} ha VENCIDO:
+      Le escribimos de FF Construction and Remodeling, para notificarle que su aseguranza HA VENCIDO.
 
-📋 Detalles:
-• Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}
-• Compañía: ${insurance.data.insurance_company || 'N/A'}
-• Póliza: ${insurance.data.policy_number || 'N/A'}
-• Fecha de vencimiento: ${expirationDate.toLocaleDateString('es-ES')}
+      LE AGRADECEMOS que envíe su aseguranza actualizada a nuestro correo: jesus@fantasticfloorskc.com
 
-⚠️ Acción Requerida: Por favor, renueva este seguro lo antes posible para mantener el cumplimiento normativo.
+      Para seguir llevando su proceso de pago normalmente se les agradece.
 
-Accede a tu cuenta para más detalles: ${req.headers.get('origin') || 'https://tu-app.com'}
+      Detalle:
+      • Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}
+      • Compañía: ${insurance.data.insurance_company || 'N/A'}
+      • Póliza: ${insurance.data.policy_number || 'N/A'}
+      • Vencimiento: ${expirationDate.toLocaleDateString('es-ES')}
 
-Saludos,
-Sistema de Gestión de Contratistas
+      Saludos,
+      FF Construction and Remodeling
         `;
         
         await base44.asServiceRole.integrations.Core.SendEmail({
@@ -104,26 +103,25 @@ Sistema de Gestión de Contratistas
       }
       
       // Seguro próximo a vencer (1-30 días)
-      else if (daysUntilExpiry > 0 && daysUntilExpiry <= 30 && !insurance.data.reminder_sent) {
-        const emailBody = `
-Hola ${contractor.data.contact_name || contractor.data.company_name},
+       else if (daysUntilExpiry > 0 && daysUntilExpiry <= 30 && !insurance.data.reminder_sent) {
+         const emailBody = `Hola ${contractor.data.contact_name || contractor.data.company_name},
 
-El seguro de ${contractor.data.company_name} VENCE PRONTO:
+      Le escribimos de FF Construction and Remodeling, para recordarle que su aseguranza está a punto de vencer.
 
-📋 Detalles:
-• Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}
-• Compañía: ${insurance.data.insurance_company || 'N/A'}
-• Póliza: ${insurance.data.policy_number || 'N/A'}
-• Fecha de vencimiento: ${expirationDate.toLocaleDateString('es-ES')}
-• Días restantes: ${daysUntilExpiry}
+      LE AGRADECEMOS que envíe su aseguranza actualizada a nuestro correo: jesus@fantasticfloorskc.com
 
-📌 Recordatorio: Te recomendamos renovar este seguro con anticipación para evitar interrupciones en la cobertura.
+      Para seguir llevando su proceso de pago normalmente se les agradece.
 
-Accede a tu cuenta para más detalles: ${req.headers.get('origin') || 'https://tu-app.com'}
+      Detalle:
+      • Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}
+      • Compañía: ${insurance.data.insurance_company || 'N/A'}
+      • Póliza: ${insurance.data.policy_number || 'N/A'}
+      • Vence: ${expirationDate.toLocaleDateString('es-ES')}
+      • Días restantes: ${daysUntilExpiry}
 
-Saludos,
-Sistema de Gestión de Contratistas
-        `;
+      Saludos,
+      FF Construction and Remodeling
+         `;
         
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: contractor.data.email,
