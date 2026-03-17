@@ -4,6 +4,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     
+    // Configurar Twilio
+    const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+    const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+    const twilioPhone = Deno.env.get('TWILIO_PHONE_NUMBER');
+    
+    const twilioAuth = btoa(`${accountSid}:${authToken}`);
+    
     // Obtener todos los seguros y contratistas
     const insurances = await base44.asServiceRole.entities.Insurance.list();
     const contractors = await base44.asServiceRole.entities.Contractor.list();
@@ -12,6 +19,7 @@ Deno.serve(async (req) => {
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     
     let emailsSent = 0;
+    let smsSent = 0;
     const alerts = [];
     
     for (const insurance of insurances) {
@@ -49,6 +57,27 @@ Sistema de Gestión de Contratistas
           body: emailBody,
           from_name: 'ContractorHub'
         });
+        
+        // Enviar SMS si está configurado Twilio
+        if (accountSid && authToken && twilioPhone && contractor.data.phone) {
+          const smsMessage = `⚠️ URGENTE: El seguro de ${contractor.data.company_name} ha VENCIDO. Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}. Por favor, renuévalo lo antes posible. Accede a tu cuenta para más detalles.`;
+          
+          const formData = new URLSearchParams();
+          formData.append('From', twilioPhone);
+          formData.append('To', contractor.data.phone);
+          formData.append('Body', smsMessage);
+          
+          await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Basic ${twilioAuth}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+          });
+          
+          smsSent++;
+        }
         
         // Actualizar estado
         await base44.asServiceRole.entities.Insurance.update(insurance.id, {
@@ -94,6 +123,27 @@ Sistema de Gestión de Contratistas
           from_name: 'ContractorHub'
         });
         
+        // Enviar SMS si está configurado Twilio
+        if (accountSid && authToken && twilioPhone && contractor.data.phone) {
+          const smsMessage = `📅 Recordatorio: El seguro de ${contractor.data.company_name} vence en ${daysUntilExpiry} días. Tipo: ${insurance.data.insurance_type.replace(/_/g, ' ')}. Renuévalo con anticipación.`;
+          
+          const formData = new URLSearchParams();
+          formData.append('From', twilioPhone);
+          formData.append('To', contractor.data.phone);
+          formData.append('Body', smsMessage);
+          
+          await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Basic ${twilioAuth}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+          });
+          
+          smsSent++;
+        }
+        
         // Actualizar estado
         await base44.asServiceRole.entities.Insurance.update(insurance.id, {
           ...insurance.data,
@@ -113,9 +163,10 @@ Sistema de Gestión de Contratistas
     
     return Response.json({
       success: true,
-      message: `Se procesaron ${insurances.length} seguros. ${emailsSent} notificaciones enviadas.`,
+      message: `Se procesaron ${insurances.length} seguros. ${emailsSent} correos y ${smsSent} SMS enviados.`,
       alerts,
       emailsSent,
+      smsSent,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
