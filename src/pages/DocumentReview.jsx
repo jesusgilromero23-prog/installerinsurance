@@ -119,10 +119,10 @@ export default function DocumentReview() {
     );
   };
   
-  const TabSection = ({ title, documents, icon: Icon, bgColor }) => (
+  const TabSection = ({ title, documents, icon, bgColor }) => (
     <div>
       <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-        <Icon className="w-5 h-5" />
+        {icon && React.createElement(icon, { className: 'w-5 h-5' })}
         {title} ({documents.length})
       </h3>
       

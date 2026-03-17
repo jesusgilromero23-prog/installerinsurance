@@ -9,7 +9,8 @@ import {
   Bell, 
   Settings,
   Building2,
-  X
+  X,
+  CheckSquare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +18,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/Dashboard' },
   { icon: Users, label: 'Contratistas', path: '/Contractors' },
   { icon: Shield, label: 'Seguros', path: '/Insurances' },
+  { icon: CheckSquare, label: 'Revisar Docs', path: '/DocumentReview' },
   { icon: Bell, label: 'Alertas', path: '/Alerts' },
 ];
 
