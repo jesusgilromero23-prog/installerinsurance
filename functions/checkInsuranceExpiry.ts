@@ -179,10 +179,27 @@ Sistema de Gestión de Contratistas
       }
     }
     
+    // Enviar notificación a la empresa si hay alertas
+    if (companyAlerts.length > 0 && companyEmail) {
+      const companyEmailBody = `Resumen de Alertas de Vencimiento en ${notificationDays} días:\n\n${
+        companyAlerts.map(alert => 
+          `• ${alert.contractor}\n  ${alert.item}\n  Vence: ${alert.expirationDate} (en ${alert.daysUntilExpiry} días)\n`
+        ).join('\n')
+      }\n\nPor favor, verifica el sistema para más detalles.`;
+      
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: companyEmail,
+        subject: `⚠️ Resumen de Vencimientos Próximos - ${new Date().toLocaleDateString('es-MX')}`,
+        body: companyEmailBody,
+        from_name: 'ContractorHub'
+      });
+    }
+    
     return Response.json({
       success: true,
-      message: `Se procesaron ${insurances.length} seguros. ${emailsSent} correos y ${smsSent} SMS enviados.`,
+      message: `Se procesaron ${insurances.length} seguros. ${emailsSent} correos y ${smsSent} SMS enviados. Alerta a empresa: ${companyAlerts.length > 0 ? 'Sí' : 'No'}.`,
       alerts,
+      companyAlerts,
       emailsSent,
       smsSent,
       timestamp: new Date().toISOString()
