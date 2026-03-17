@@ -91,7 +91,7 @@ export default function DocumentReview() {
           to: contractor.data.email,
           subject: emailSubject,
           body: emailBody,
-          from_name: 'ContractorHub'
+          from_name: 'FF Construction Aseguranzas'
         });
       }
       
