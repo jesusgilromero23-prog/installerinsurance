@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Image, Download, Trash2, Calendar } from 'lucide-react';
+import { FileText, Image, Download, Trash2, Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -16,25 +16,65 @@ const documentTypes = {
   other: { label: 'Otro', color: 'bg-gray-100 text-gray-700' }
 };
 
-export default function DocumentCard({ document, onDelete }) {
+const statusConfig = {
+  pending_review: { 
+    label: 'Pendiente de Revisión', 
+    icon: Clock, 
+    color: 'bg-amber-50 border-amber-200',
+    badge: 'bg-amber-100 text-amber-700'
+  },
+  approved: { 
+    label: 'Aprobado', 
+    icon: CheckCircle, 
+    color: 'bg-emerald-50 border-emerald-200',
+    badge: 'bg-emerald-100 text-emerald-700'
+  },
+  rejected: { 
+    label: 'Rechazado', 
+    icon: XCircle, 
+    color: 'bg-red-50 border-red-200',
+    badge: 'bg-red-100 text-red-700'
+  }
+};
+
+export default function DocumentCard({ document, onDelete, showStatus = true }) {
   const typeInfo = documentTypes[document.document_type] || documentTypes.other;
+  const status = statusConfig[document.status] || statusConfig.pending_review;
+  const StatusIcon = status.icon;
+  
   const isImage = document.file_type?.startsWith('image') || 
     ['jpg', 'jpeg', 'png', 'gif', 'webp'].some(ext => document.file_url?.toLowerCase().includes(ext));
   
   return (
-    <Card className="overflow-hidden group hover:shadow-md transition-shadow">
+    <Card className={`overflow-hidden group hover:shadow-md transition-shadow border ${status.color}`}>
       <CardContent className="p-0">
         {isImage ? (
-          <div className="h-32 bg-muted overflow-hidden">
+          <div className="h-32 bg-muted overflow-hidden relative">
             <img 
               src={document.file_url} 
               alt={document.document_name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
+            {showStatus && (
+              <div className="absolute top-2 right-2">
+                <Badge className={status.badge}>
+                  <StatusIcon className="w-3 h-3 mr-1" />
+                  {status.label}
+                </Badge>
+              </div>
+            )}
           </div>
         ) : (
-          <div className="h-32 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+          <div className="h-32 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center relative">
             <FileText className="w-12 h-12 text-muted-foreground/50" />
+            {showStatus && (
+              <div className="absolute top-2 right-2">
+                <Badge className={status.badge}>
+                  <StatusIcon className="w-3 h-3 mr-1" />
+                  {status.label}
+                </Badge>
+              </div>
+            )}
           </div>
         )}
         
@@ -55,6 +95,19 @@ export default function DocumentCard({ document, onDelete }) {
           
           {document.notes && (
             <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{document.notes}</p>
+          )}
+          
+          {document.approval_comments && (
+            <div className={`text-sm p-2 rounded mb-3 ${
+              document.status === 'rejected' 
+                ? 'bg-red-50 text-red-700 border border-red-100' 
+                : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+            }`}>
+              <p className="font-medium mb-1">
+                {document.status === 'rejected' ? '❌ Razón del rechazo:' : '✅ Comentarios:'}
+              </p>
+              <p>{document.approval_comments}</p>
+            </div>
           )}
           
           <div className="flex items-center gap-2">

@@ -57,7 +57,8 @@ export default function AddDocumentModal({ open, onClose, contractorId, onSucces
       ...formData,
       contractor_id: contractorId,
       file_url,
-      file_type: file.type
+      file_type: file.type,
+      status: 'pending_review'
     });
     
     setIsLoading(false);

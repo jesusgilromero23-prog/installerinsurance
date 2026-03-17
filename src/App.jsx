@@ -13,6 +13,7 @@ import ContractorForm from '@/pages/ContractorForm';
 import ContractorDetail from '@/pages/ContractorDetail';
 import Insurances from '@/pages/Insurances';
 import Alerts from '@/pages/Alerts';
+import DocumentReview from '@/pages/DocumentReview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
         <Route path="/Contractor/:id" element={<ContractorDetail />} />
         <Route path="/Insurances" element={<Insurances />} />
         <Route path="/Alerts" element={<Alerts />} />
+        <Route path="/DocumentReview" element={<DocumentReview />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
