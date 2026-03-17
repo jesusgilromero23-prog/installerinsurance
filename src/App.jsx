@@ -5,7 +5,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import { Navigate } from 'react-router-dom';
+import AppLayout from '@/components/layout/AppLayout';
+import Dashboard from '@/pages/Dashboard';
+import Contractors from '@/pages/Contractors';
+import ContractorForm from '@/pages/ContractorForm';
+import ContractorDetail from '@/pages/ContractorDetail';
+import Insurances from '@/pages/Insurances';
+import Alerts from '@/pages/Alerts';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +40,16 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Navigate to="/Dashboard" replace />} />
+      <Route element={<AppLayout />}>
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Contractors" element={<Contractors />} />
+        <Route path="/Contractors/new" element={<ContractorForm />} />
+        <Route path="/Contractors/:id" element={<ContractorForm />} />
+        <Route path="/Contractor/:id" element={<ContractorDetail />} />
+        <Route path="/Insurances" element={<Insurances />} />
+        <Route path="/Alerts" element={<Alerts />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
