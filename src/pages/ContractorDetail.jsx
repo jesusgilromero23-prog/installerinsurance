@@ -37,39 +37,57 @@ export default function ContractorDetail() {
   const { data: contractors, isLoading } = useQuery({
     queryKey: ['contractor', id],
     queryFn: () => base44.entities.Contractor.filter({ id }),
+    staleTime: 5 * 60 * 1000,
+    retry: 2
   });
   
   const { data: insurances = [], refetch: refetchInsurances } = useQuery({
     queryKey: ['insurances', id],
     queryFn: () => base44.entities.Insurance.filter({ contractor_id: id }),
+    staleTime: 3 * 60 * 1000,
+    retry: 2
   });
   
   const { data: documents = [], refetch: refetchDocuments } = useQuery({
     queryKey: ['documents', id],
     queryFn: () => base44.entities.Document.filter({ contractor_id: id }),
+    staleTime: 3 * 60 * 1000,
+    retry: 2
   });
   
   const contractor = contractors?.[0];
   
   const handleDeleteContractor = async () => {
-    await base44.entities.Contractor.delete(id);
-    toast.success('Contratista eliminado');
-    queryClient.invalidateQueries({ queryKey: ['contractors'] });
-    navigate('/Contractors');
+    try {
+      await base44.entities.Contractor.delete(id);
+      toast.success('Contratista eliminado');
+      queryClient.invalidateQueries({ queryKey: ['contractors'] });
+      navigate('/Contractors');
+    } catch (error) {
+      toast.error('Error al eliminar el contratista');
+    }
   };
   
   const handleDeleteInsurance = async () => {
-    await base44.entities.Insurance.delete(deleteInsurance.id);
-    toast.success('Seguro eliminado');
-    refetchInsurances();
-    setDeleteInsurance(null);
+    try {
+      await base44.entities.Insurance.delete(deleteInsurance.id);
+      toast.success('Seguro eliminado');
+      await refetchInsurances();
+      setDeleteInsurance(null);
+    } catch (error) {
+      toast.error('Error al eliminar el seguro');
+    }
   };
   
   const handleDeleteDocument = async () => {
-    await base44.entities.Document.delete(deleteDocument.id);
-    toast.success('Documento eliminado');
-    refetchDocuments();
-    setDeleteDocument(null);
+    try {
+      await base44.entities.Document.delete(deleteDocument.id);
+      toast.success('Documento eliminado');
+      await refetchDocuments();
+      setDeleteDocument(null);
+    } catch (error) {
+      toast.error('Error al eliminar el documento');
+    }
   };
   
   if (isLoading) {
