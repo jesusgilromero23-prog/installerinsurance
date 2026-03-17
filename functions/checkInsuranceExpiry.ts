@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
           to: contractor.data.email,
           subject: `⚠️ URGENTE: Seguro Vencido - ${contractor.data.company_name}`,
           body: emailBody,
-          from_name: 'FF Construction Aseguranzas'
+          from_name: 'ContractorHub'
         });
         
         // Enviar SMS si está configurado Twilio
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
           to: contractor.data.email,
           subject: `📅 Recordatorio: Seguro por Vencer en ${daysUntilExpiry} días - ${contractor.data.company_name}`,
           body: emailBody,
-          from_name: 'FF Construction Aseguranzas'
+          from_name: 'ContractorHub'
         });
         
         // Enviar SMS si está configurado Twilio
@@ -201,7 +201,7 @@ Deno.serve(async (req) => {
           to: companyEmail,
           subject: `⚠️ Resumen de Vencimientos Próximos - ${new Date().toLocaleDateString('es-MX')}`,
           body: companyEmailBody,
-          from_name: 'FF Construction Aseguranzas'
+          from_name: 'ContractorHub'
         });
       } catch (emailError) {
         console.error('Error enviando email a empresa:', emailError.message);
