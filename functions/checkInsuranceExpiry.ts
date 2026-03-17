@@ -11,16 +11,25 @@ Deno.serve(async (req) => {
     
     const twilioAuth = btoa(`${accountSid}:${authToken}`);
     
+    // Obtener configuración de la aplicación
+    const appConfigs = await base44.asServiceRole.entities.AppConfig.list();
+    const appConfig = appConfigs.length > 0 ? appConfigs[0].data : null;
+    const companyEmail = appConfig?.notification_email;
+    const notificationDays = appConfig?.notification_days_before || 3;
+    
     // Obtener todos los seguros y contratistas
     const insurances = await base44.asServiceRole.entities.Insurance.list();
     const contractors = await base44.asServiceRole.entities.Contractor.list();
+    const documents = await base44.asServiceRole.entities.Document.list();
     
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const notificationDate = new Date(now.getTime() + notificationDays * 24 * 60 * 60 * 1000);
     
     let emailsSent = 0;
     let smsSent = 0;
     const alerts = [];
+    let companyAlerts = [];
     
     for (const insurance of insurances) {
       const expirationDate = new Date(insurance.data.expiration_date);
@@ -156,6 +165,15 @@ Sistema de Gestión de Contratistas
           type: 'expiring_soon',
           contractor: contractor.data.company_name,
           insuranceType: insurance.data.insurance_type,
+          daysUntilExpiry
+        });
+        
+        // Agregar a alertas de la empresa
+        companyAlerts.push({
+          type: 'insurance',
+          contractor: contractor.data.company_name,
+          item: `Seguro: ${insurance.data.insurance_type.replace(/_/g, ' ')}`,
+          expirationDate: insurance.data.expiration_date,
           daysUntilExpiry
         });
       }

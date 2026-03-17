@@ -20,6 +20,7 @@ const menuItems = [
   { icon: Shield, label: 'Seguros', path: '/Insurances' },
   { icon: CheckSquare, label: 'Revisar Docs', path: '/DocumentReview' },
   { icon: Bell, label: 'Alertas', path: '/Alerts' },
+  { icon: Settings, label: 'Configuración', path: '/Settings' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
