@@ -3,10 +3,11 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    
-    // Verificar que sea un admin (solo admins pueden ejecutar esta función)
-    if (user?.role !== 'admin') {
+
+    // Esta función es llamada por automatización programada (sin usuario)
+    // o manualmente por un admin. Solo verificar si hay usuario.
+    const user = await base44.auth.isAuthenticated() ? await base44.auth.me() : null;
+    if (user && user.role !== 'admin') {
       return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
     
