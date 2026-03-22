@@ -38,7 +38,12 @@ Deno.serve(async (req) => {
     let companyAlerts = [];
     
     for (const insurance of insurances) {
+      // Saltar registros sin fecha de vencimiento
+      if (!insurance.data?.expiration_date) continue;
+
       const expirationDate = new Date(insurance.data.expiration_date);
+      if (isNaN(expirationDate.getTime())) continue;
+
       const contractor = contractors.find(c => c.id === insurance.data.contractor_id);
       
       if (!contractor) continue;
