@@ -1,0 +1,72 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "contractor_id": {
+      "type": "string",
+      "description": "ID del contratista"
+    },
+    "document_name": {
+      "type": "string",
+      "description": "Nombre del documento"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "w9",
+        "contract",
+        "license",
+        "certificate",
+        "insurance",
+        "id",
+        "other"
+      ],
+      "description": "Tipo de documento"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL del archivo"
+    },
+    "file_type": {
+      "type": "string",
+      "description": "Tipo de archivo (pdf, jpg, png, etc)"
+    },
+    "expiration_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de vencimiento si aplica"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas sobre el documento"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending_review",
+      "description": "Estado del documento"
+    },
+    "approval_comments": {
+      "type": "string",
+      "description": "Comentarios de aprobaci\u00f3n o rechazo"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Email del administrador que revis\u00f3"
+    },
+    "reviewed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de revisi\u00f3n"
+    }
+  },
+  "required": [
+    "contractor_id",
+    "document_name",
+    "file_url"
+  ]
+}

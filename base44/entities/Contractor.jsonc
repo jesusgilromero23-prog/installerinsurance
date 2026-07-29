@@ -1,0 +1,70 @@
+{
+  "name": "Contractor",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Nombre de la empresa del contratista"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Nombre del contacto principal"
+    },
+    "irs_number": {
+      "type": "string",
+      "description": "N\u00famero del IRS (EIN o SSN)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Direcci\u00f3n completa"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad"
+    },
+    "state": {
+      "type": "string",
+      "description": "Estado"
+    },
+    "zip_code": {
+      "type": "string",
+      "description": "C\u00f3digo postal"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono"
+    },
+    "email": {
+      "type": "string",
+      "description": "Correo electr\u00f3nico"
+    },
+    "profession": {
+      "type": "string",
+      "description": "Profesi\u00f3n o dedicaci\u00f3n"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "pending"
+      ],
+      "default": "active",
+      "description": "Estado del contratista"
+    },
+    "profile_image": {
+      "type": "string",
+      "description": "URL de la imagen de perfil o logo"
+    }
+  },
+  "required": [
+    "company_name",
+    "irs_number",
+    "email",
+    "phone"
+  ]
+}

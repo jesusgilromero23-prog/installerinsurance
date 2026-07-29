@@ -1,0 +1,68 @@
+{
+  "name": "Insurance",
+  "type": "object",
+  "properties": {
+    "contractor_id": {
+      "type": "string",
+      "description": "ID del contratista"
+    },
+    "insurance_type": {
+      "type": "string",
+      "enum": [
+        "general_liability",
+        "workers_comp",
+        "auto",
+        "professional",
+        "umbrella",
+        "other"
+      ],
+      "description": "Tipo de seguro"
+    },
+    "insurance_company": {
+      "type": "string",
+      "description": "Compa\u00f1\u00eda aseguradora"
+    },
+    "policy_number": {
+      "type": "string",
+      "description": "N\u00famero de p\u00f3liza"
+    },
+    "coverage_amount": {
+      "type": "number",
+      "description": "Monto de cobertura"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "expiration_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de vencimiento"
+    },
+    "document_url": {
+      "type": "string",
+      "description": "URL del documento del seguro"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "expiring_soon"
+      ],
+      "default": "active",
+      "description": "Estado del seguro"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si ya se envi\u00f3 recordatorio"
+    }
+  },
+  "required": [
+    "contractor_id",
+    "insurance_type",
+    "expiration_date"
+  ]
+}

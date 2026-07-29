@@ -1,0 +1,16 @@
+{
+  "name": "AppConfig",
+  "type": "object",
+  "properties": {
+    "notification_email": {
+      "type": "string",
+      "description": "Correo de la empresa para notificaciones de vencimiento"
+    },
+    "notification_days_before": {
+      "type": "number",
+      "default": 3,
+      "description": "D\u00edas antes del vencimiento para notificar"
+    }
+  },
+  "required": []
+}
